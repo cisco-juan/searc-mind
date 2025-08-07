@@ -281,6 +281,8 @@ El script `init-db.sql` configura automáticamente:
 
 ## 🤝 Contribución
 
+[Contribución](./CONTRIBUTING.md)
+
 1. **Fork del repositorio**: Haz un fork del proyecto a tu cuenta de GitHub
 2. **Clonar tu fork**: `git clone https://github.com/tu-usuario/search-mind.git`
 3. **Crear rama feature**: `git checkout -b feature/nueva-funcionalidad`

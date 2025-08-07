@@ -1,0 +1,103 @@
+name: ✨ Feature Request
+description: Sugerir una nueva funcionalidad para SearchMind
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por sugerir una nueva funcionalidad! Por favor, proporciona los siguientes detalles.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Tipo de Funcionalidad
+      description: ¿Qué tipo de funcionalidad estás solicitando?
+      options:
+        - Nueva funcionalidad del RAG
+        - Mejora de la interfaz web
+        - Nueva API endpoint
+        - Integración con servicio externo
+        - Mejora de performance
+        - Mejora de seguridad
+        - Documentación
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema a Resolver
+      description: ¿Qué problema resolvería esta funcionalidad?
+      placeholder: Como usuario, tengo dificultad para...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solución Propuesta
+      description: Descripción clara de la funcionalidad que deseas
+      placeholder: Me gustaría poder...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: ¿Has considerado otras formas de resolver esto?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioridad
+      description: ¿Qué tan importante es esta funcionalidad?
+      options:
+        - Baja - Nice to have
+        - Media - Sería útil
+        - Alta - Necesaria para mi flujo de trabajo
+        - Crítica - Bloqueante
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_cases
+    attributes:
+      label: Casos de Uso
+      description: Describe escenarios específicos donde usarías esta funcionalidad
+      placeholder: |
+        1. Cuando estoy trabajando con...
+        2. En el contexto de...
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups/Screenshots
+      description: Si tienes ideas visuales, compártelas aquí
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impacto Esperado
+      options:
+        - label: Mejoraría la experiencia de usuario
+        - label: Aumentaría la productividad
+        - label: Resolvería un problema común
+        - label: Sería útil para nuevos usuarios
+        - label: Mejoraría la performance
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: He buscado si esta funcionalidad ya fue solicitada
+          required: true
+        - label: He considerado si esto puede resolverse con funcionalidad existente
+          required: true
+        - label: Esta funcionalidad sería útil para otros usuarios
+          required: true

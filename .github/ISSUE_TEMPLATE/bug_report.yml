@@ -1,0 +1,101 @@
+name: 🐛 Bug Report
+description: Reportar un problema o error en SearchMind
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar este bug. Por favor, completa la siguiente información para ayudarnos a resolverlo.
+
+  - type: input
+    id: version
+    attributes:
+      label: Versión
+      description: ¿Qué versión de SearchMind estás usando?
+      placeholder: "v1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Entorno
+      description: ¿Dónde está ocurriendo el problema?
+      options:
+        - Docker (Recomendado)
+        - Desarrollo Local
+        - Producción
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción del Problema
+      description: Descripción clara y concisa del problema
+      placeholder: El sistema falla cuando...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para Reproducir
+      description: Pasos detallados para reproducir el error
+      placeholder: |
+        1. Ir a...
+        2. Hacer clic en...
+        3. Ver error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento Esperado
+      description: ¿Qué esperabas que sucediera?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamiento Actual
+      description: ¿Qué está sucediendo en su lugar?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs y Errores
+      description: Copia cualquier log relevante o mensaje de error
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Agrega screenshots si ayudan a explicar el problema
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Información Adicional
+      description: Cualquier otra información relevante
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: He buscado issues similares existentes
+          required: true
+        - label: He leído la documentación
+          required: true
+        - label: Este bug es reproducible
+          required: true
