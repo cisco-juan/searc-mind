@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database con pgvector para desarrollo
+  database:
+    image: pgvector/pgvector:pg15
+    container_name: search-mind-db-dev
+    environment:
+      POSTGRES_DB: search_mind_dev
+      POSTGRES_USER: search_mind_user
+      POSTGRES_PASSWORD: search_mind_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5433:5432"  # Puerto diferente para desarrollo
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - search-mind-dev-network
+
+  # Ollama Service para desarrollo
+  ollama:
+    image: ollama/ollama:latest
+    container_name: search-mind-ollama-dev
+    ports:
+      - "11435:11434"  # Puerto diferente para desarrollo
+    volumes:
+      - ollama_dev_data:/root/.ollama
+    networks:
+      - search-mind-dev-network
+    environment:
+      - OLLAMA_ORIGINS=*
+
+  # pgAdmin para gestión de base de datos (opcional)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: search-mind-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@searchmind.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    networks:
+      - search-mind-dev-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+networks:
+  search-mind-dev-network:
+    driver: bridge
+    name: search-mind-dev-network
+
+volumes:
+  postgres_dev_data:
+    name: search-mind-postgres-dev-data
+  ollama_dev_data:
+    name: search-mind-ollama-dev-data
+  pgadmin_data:
+    name: search-mind-pgadmin-data
