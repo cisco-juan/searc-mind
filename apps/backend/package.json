@@ -69,5 +69,7 @@
         "command": "docker build -f apps/backend/Dockerfile . -t search-mind-backend"
       }
     }
+  },
+  "dependencies": {
   }
 }
