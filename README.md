@@ -2,6 +2,8 @@
 
 **Sistema RAG (Retrieval-Augmented Generation) - Tu Asistente Personal Inteligente**
 
+[English Version](./README.en.md)
+
 SearchMind es una aplicación web inteligente que utiliza técnicas de inteligencia artificial para crear un asistente personal personalizado con tus propios datos. Combina la potencia de modelos de lenguaje locales (Ollama) con búsqueda vectorial para proporcionar respuestas precisas y contextualizadas basadas en los documentos que tú alimentes al sistema.
 
 ## 🚀 Características
