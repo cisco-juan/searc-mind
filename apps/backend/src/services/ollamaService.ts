@@ -1,7 +1,7 @@
 import { Ollama } from 'ollama';
 import { config } from '../config/env.js';
 import { logger } from '../utils/logger.js';
-import type { OllamaResponse, OllamaEmbeddingResponse } from '../types/index.js';
+import type { OllamaResponse, OllamaEmbeddingResponse } from '../../../../libs/src/types/index.js';
 
 export class OllamaService {
   private ollama: Ollama;

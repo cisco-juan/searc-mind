@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import pdf from 'pdf-parse';
 import { logger } from '../utils/logger.js';
-import type { ChunkOptions, DocumentMetadata } from '../types/index.js';
+import type { ChunkOptions, DocumentMetadata } from '../../../../libs/src/types/index.js';
 import { RAGService } from './ragService.js';
 
 export class DocumentLoader {

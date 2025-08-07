@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { OllamaService } from '../services/ollamaService.js';
 import { RAGService } from '../services/ragService.js';
 import { logger } from '../utils/logger.js';
-import type { QueryResponse } from '../types/index.js';
+import type { QueryResponse } from '../../../../libs/src/types/index.js';
 import { DocumentLoader } from '../services/documentLoader.js';
 import multer from 'multer';
 import path from 'path';

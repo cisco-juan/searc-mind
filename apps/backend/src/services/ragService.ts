@@ -1,7 +1,7 @@
 import { database } from '../config/database.js';
 import { OllamaService } from './ollamaService.js';
 import { logger } from '../utils/logger.js';
-import type { DocumentSource, DocumentMetadata } from '../types/index.js';
+import type { DocumentSource, DocumentMetadata } from '../../../../libs/src/types/index.js';
 
 export class RAGService {
   private ollamaService: OllamaService;
