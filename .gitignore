@@ -47,3 +47,7 @@ Thumbs.db
 .env
 CLAUDE.md
 package-lock.json
+
+# Next.js
+.next
+out
