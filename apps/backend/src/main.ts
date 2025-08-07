@@ -78,7 +78,7 @@ async function startServer() {
     // Iniciar servidor
     const server = app.listen(PORT, () => {
       logger.info(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-      logger.info(`📚 Agente Código Penal RD listo para consultas`);
+      logger.info(`📚 Agente SearchMind listo para consultas`);
       logger.info(`🌍 Entorno: ${config.get().NODE_ENV}`);
     });
 

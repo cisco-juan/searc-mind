@@ -18,20 +18,21 @@ export class OllamaService {
 
   async generateResponse(prompt: string, context: string = ''): Promise<string> {
     try {
-      const systemPrompt = `Eres un asistente personal que ayuda a resolver las dudas del usuario basándote EXCLUSIVAMENTE en los documentos que el usuario ha cargado.
+      // Debug temporal
+      logger.debug(`Prompt: ${prompt.substring(0, 100)}...`);
+      logger.debug(`Context length: ${context.length}`);
+      logger.debug(`Context preview: ${context.substring(0, 200)}...`);
+    
+      // Si no hay contexto, respuesta simple
+      if (!context || context.trim().length === 0) {
+        return 'No tengo documentos cargados actualmente. Por favor, sube algunos documentos para que pueda ayudarte con consultas específicas basadas en su contenido.';
+      }
 
-        INSTRUCCIONES IMPORTANTES:
-        1. SOLO puedes responder con información que esté EXPLÍCITAMENTE presente en el contexto proporcionado
-        2. Si la información solicitada NO está en el contexto, debes responder: "No tengo información suficiente en los documentos cargados para responder esta pregunta"
-        3. NUNCA inventes, asumas o proporciones información que no esté en el contexto
-        4. Cita siempre las referencias cuando sea posible
-        5. Responde en español, de manera clara y profesional
-        6. Si hay múltiples referencias relevantes, menciónalas todas
+      const systemPrompt = `Responde directamente basándote en la siguiente información. Sé conversacional y ve al grano.
 
-        ${context ? `CONTEXTO DE LOS DOCUMENTOS CARGADOS:
-        ${context}
+${context}
 
-        Recuerda: SOLO usa la información del contexto anterior para responder.` : 'No hay documentos cargados actualmente. Responde que necesitas que el usuario cargue documentos primero.'}`;
+Responde la pregunta del usuario usando esta información de forma natural y directa.`;
 
       const startTime = Date.now();
       
@@ -42,7 +43,7 @@ export class OllamaService {
           { role: 'user', content: prompt }
         ],
         options: {
-          temperature: 0.2,
+          temperature: 0.4,
           top_p: 0.9,
           top_k: 40,
         },

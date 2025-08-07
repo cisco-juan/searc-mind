@@ -4,9 +4,9 @@ import { GeistMono } from 'geist/font/mono'
 import './global.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'SearchMind - Asistente Personal IA',
+  description: 'Tu asistente personal de IA para consultas basadas en documentos',
+  generator: 'SearchMind',
 }
 
 export default function RootLayout({

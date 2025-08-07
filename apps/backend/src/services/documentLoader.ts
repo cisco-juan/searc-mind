@@ -92,20 +92,16 @@ export class DocumentLoader {
     };
   }
 
-  async loadPDF(filePath: string, options?: ChunkOptions): Promise<void> {
+  // Método para procesar PDF desde buffer (para uploads)
+  async loadPDFFromBuffer(buffer: Buffer, fileName: string, options?: ChunkOptions): Promise<void> {
     try {
-      logger.info(`📄 Cargando PDF: ${filePath}`);
+      logger.info(`📄 Procesando PDF desde buffer: ${fileName}`);
       
-      const dataBuffer = await fs.readFile(filePath);
-      const data = await pdf(dataBuffer);
-      
-      // Liberar buffer inmediatamente
-      dataBuffer.fill(0);
+      const data = await pdf(buffer);
       
       logger.info(`📊 Tamaño del texto extraído: ${Math.round(data.text.length / 1024)} KB`);
       
       const chunks = this.splitTextIntoChunks(data.text, options);
-      const fileName = path.basename(filePath);
       
       logger.info(`🧩 Dividido en ${chunks.length} chunks`);
       
@@ -149,20 +145,20 @@ export class DocumentLoader {
         logger.info(`✅ Lote ${batch + 1}/${totalBatches} completado`);
       }
       
-      logger.info(`✅ PDF cargado completamente: ${chunks.length} chunks de ${fileName}`);
+      logger.info(`✅ PDF procesado completamente: ${chunks.length} chunks de ${fileName}`);
     } catch (error) {
-      logger.error(`Error cargando PDF ${filePath}:`, error);
+      logger.error(`Error procesando PDF desde buffer ${fileName}:`, error);
       throw error;
     }
   }
 
-  async loadTextFile(filePath: string, options?: ChunkOptions): Promise<void> {
+  // Método para procesar texto desde buffer (para uploads)
+  async loadTextFromBuffer(buffer: Buffer, fileName: string, options?: ChunkOptions): Promise<void> {
     try {
-      logger.info(`📄 Cargando archivo de texto: ${filePath}`);
+      logger.info(`📄 Procesando archivo de texto desde buffer: ${fileName}`);
       
-      const text = await fs.readFile(filePath, 'utf-8');
+      const text = buffer.toString('utf-8');
       const chunks = this.splitTextIntoChunks(text, options);
-      const fileName = path.basename(filePath);
       
       for (let i = 0; i < chunks.length; i++) {
         const extractedInfo = this.extractArticleInfo(chunks[i]);
@@ -177,7 +173,38 @@ export class DocumentLoader {
         await this.ragService.addDocument(chunks[i], metadata);
       }
       
-      logger.info(`✅ Archivo cargado: ${chunks.length} chunks de ${fileName}`);
+      logger.info(`✅ Archivo procesado: ${chunks.length} chunks de ${fileName}`);
+    } catch (error) {
+      logger.error(`Error procesando archivo de texto desde buffer ${fileName}:`, error);
+      throw error;
+    }
+  }
+
+  async loadPDF(filePath: string, options?: ChunkOptions): Promise<void> {
+    try {
+      logger.info(`📄 Cargando PDF: ${filePath}`);
+      
+      const dataBuffer = await fs.readFile(filePath);
+      const fileName = path.basename(filePath);
+      
+      await this.loadPDFFromBuffer(dataBuffer, fileName, options);
+      
+      // Liberar buffer inmediatamente
+      dataBuffer.fill(0);
+    } catch (error) {
+      logger.error(`Error cargando PDF ${filePath}:`, error);
+      throw error;
+    }
+  }
+
+  async loadTextFile(filePath: string, options?: ChunkOptions): Promise<void> {
+    try {
+      logger.info(`📄 Cargando archivo de texto: ${filePath}`);
+      
+      const buffer = await fs.readFile(filePath);
+      const fileName = path.basename(filePath);
+      
+      await this.loadTextFromBuffer(buffer, fileName, options);
     } catch (error) {
       logger.error(`Error cargando archivo de texto ${filePath}:`, error);
       throw error;

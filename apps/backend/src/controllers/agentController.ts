@@ -10,23 +10,13 @@ import path from 'path';
 
 const querySchema = z.object({
   query: z.string().min(1).max(1000),
-  maxResults: z.number().min(1).max(20).optional().default(5),
+  maxResults: z.number().min(1).max(20).optional().default(10),
   includeMetadata: z.boolean().optional().default(true),
 });
 
-// Configuración de multer para subida de archivos
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
+// Configuración de multer para procesar archivos en memoria
 const upload = multer({ 
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter: (_req, file, cb) => {
     const allowedTypes = ['.pdf', '.txt', '.md'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -73,7 +63,7 @@ export class AgentController {
       logger.info(`📝 Procesando consulta: ${query.substring(0, 50)}...`);
       
       const startTime = Date.now();
-      const aiResponse = await this.ragService.generateContextualResponse(query, maxResults || 5);
+      const aiResponse = await this.ragService.generateContextualResponse(query, maxResults || 10);
       const processingTime = Date.now() - startTime;
       
       const response: QueryResponse = {
@@ -98,7 +88,7 @@ export class AgentController {
       
       res.json({
         status: ollamaHealthy ? 'healthy' : 'degraded',
-        service: 'Agente Código Penal RD',
+        service: 'SearchMind',
         components: {
           ollama: ollamaHealthy ? 'operational' : 'unavailable',
           database: 'operational',
@@ -143,48 +133,44 @@ export class AgentController {
         return;
       }
 
-      const filePath = req.file.path;
-      const fileExtension = path.extname(req.file.originalname).toLowerCase();
+      const fileBuffer = req.file.buffer;
+      const fileName = req.file.originalname;
+      const fileExtension = path.extname(fileName).toLowerCase();
 
-      logger.info(`📄 Procesando archivo: ${req.file.originalname}`);
+      logger.info(`📄 Procesando archivo desde memoria: ${fileName} (${Math.round(fileBuffer.length / 1024)} KB)`);
 
-      // Cargar documento según su tipo
+      // Procesar documento según su tipo directamente desde el buffer
       if (fileExtension === '.pdf') {
-        await this.documentLoader.loadPDF(filePath);
+        await this.documentLoader.loadPDFFromBuffer(fileBuffer, fileName);
       } else if (['.txt', '.md'].includes(fileExtension)) {
-        await this.documentLoader.loadTextFile(filePath);
+        await this.documentLoader.loadTextFromBuffer(fileBuffer, fileName);
+      } else {
+        res.status(400).json({
+          success: false,
+          error: 'Tipo de archivo no soportado. Solo se permiten PDF, TXT y MD.'
+        });
+        return;
       }
-
-      // Eliminar archivo temporal
-      const fs = await import('fs/promises');
-      await fs.unlink(filePath);
 
       const stats = await this.ragService.getStatistics();
 
       res.json({
         success: true,
-        message: 'Documento cargado exitosamente',
-        filename: req.file.originalname,
+        message: 'Documento procesado exitosamente',
+        filename: fileName,
+        fileSize: Math.round(fileBuffer.length / 1024),
         totalDocuments: stats.totalDocuments,
         timestamp: new Date().toISOString(),
       });
 
     } catch (error) {
-      logger.error('Error cargando documento:', error);
-      
-      // Limpiar archivo en caso de error
-      if (req.file?.path) {
-        try {
-          const fs = await import('fs/promises');
-          await fs.unlink(req.file.path);
-        } catch (cleanupError) {
-          logger.error('Error limpiando archivo temporal:', cleanupError);
-        }
-      }
+      logger.error('Error procesando documento:', error);
 
+      const errorMessage = error instanceof Error ? error.message : 'Error procesando el documento';
       res.status(500).json({
         success: false,
         error: 'Error procesando el documento',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
       });
     }
   }
