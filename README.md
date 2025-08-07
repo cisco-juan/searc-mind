@@ -1,101 +1,300 @@
 # SearchMind
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**Sistema RAG (Retrieval-Augmented Generation) - Tu Asistente Personal Inteligente**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+SearchMind es una aplicación web inteligente que utiliza técnicas de inteligencia artificial para crear un asistente personal personalizado con tus propios datos. Combina la potencia de modelos de lenguaje locales (Ollama) con búsqueda vectorial para proporcionar respuestas precisas y contextualizadas basadas en los documentos que tú alimentes al sistema.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## 🚀 Características
 
-## Run tasks
+- **RAG (Retrieval-Augmented Generation)**: Búsqueda inteligente en tus documentos personales con contexto relevante
+- **Modelos LLM Locales**: Integración con Ollama para procesamiento offline y máxima privacidad
+- **Búsqueda Vectorial**: PostgreSQL con pgvector para similitud semántica de tus datos
+- **Asistente Personalizado**: Alimenta el sistema con tus propios documentos, notas, manuales o conocimiento
+- **Interfaz Web Moderna**: Frontend construido con Next.js 15 y React 19
+- **API RESTful**: Backend robusto con Express.js y TypeScript
+- **Containerización**: Despliegue completo con Docker y docker-compose
+- **Privacidad Total**: Todos los datos permanecen en tu infraestructura local
 
-To run the dev server for your app, use:
+## 🏗️ Arquitectura
 
-```sh
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend      │    │   PostgreSQL    │
+│   (Next.js)     │◄──►│   (Express)     │◄──►│   + pgvector    │
+│   Puerto: 3001  │    │   Puerto: 3000  │    │   Puerto: 5432  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       
+         │                       ▼                       
+         │              ┌─────────────────┐              
+         └─────────────►│     Ollama      │              
+                        │   Puerto: 11434 │              
+                        └─────────────────┘              
+```
+
+### Componentes Principales
+
+- **Apps**:
+  - `frontend/`: Interfaz web con Next.js 15, React 19 y Tailwind CSS
+  - `backend/`: API servidor con Express.js y TypeScript
+- **Libs**: Biblioteca compartida con tipos TypeScript y utilidades
+- **Servicios**:
+  - `RAGService`: Gestión de documentos, búsqueda por similitud y generación de contexto
+  - `OllamaService`: Interface para chat y embeddings con modelos locales
+  - `DocumentLoader`: Procesamiento y carga de documentos
+
+## 📋 Prerrequisitos
+
+- **Node.js** >= 18.x
+- **Docker** y **Docker Compose**
+- **PostgreSQL** con extensión `pgvector` (incluido en el stack Docker)
+- **Ollama** (incluido en el stack Docker)
+
+## 🛠️ Instalación
+
+### Opción 1: Usando Docker (Recomendado)
+
+1. **Clonar el repositorio**:
+```bash
+git clone <repository-url>
+cd search-mind
+```
+
+2. **Configurar variables de entorno**:
+```bash
+cp apps/backend/.env.template apps/backend/.env
+# Editar apps/backend/.env según sea necesario
+```
+
+3. **Construir y ejecutar con Docker**:
+```bash
+# Construir todas las imágenes
+docker-compose build
+
+# Ejecutar todos los servicios
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f
+```
+
+4. **Verificar la instalación**:
+   - Frontend: http://localhost:3001
+   - Backend API: http://localhost:3000
+   - Ollama: http://localhost:11434
+
+### Opción 2: Desarrollo Local
+
+1. **Instalar dependencias**:
+```bash
+npm install
+```
+
+2. **Configurar base de datos**:
+   - Instalar PostgreSQL con pgvector
+   - Crear base de datos `search_mind`
+   - Configurar `DATABASE_URL` en `.env`
+
+3. **Instalar y configurar Ollama**:
+```bash
+# Instalar Ollama (Linux/Mac)
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Descargar modelos necesarios
+ollama pull gemma2:2b
+ollama pull nomic-embed-text
+```
+
+4. **Ejecutar servicios**:
+```bash
+# Backend
 npx nx serve backend
+
+# Frontend (en otra terminal)
+npx nx dev frontend
 ```
 
-To create a production bundle:
+## 🚀 Uso
 
-```sh
+### Interfaz Web
+
+1. Abrir http://localhost:3001 en el navegador
+2. Cargar tus documentos personales (PDFs, textos, manuales, notas) usando el formulario de upload
+3. Realizar consultas en lenguaje natural sobre tu contenido
+4. Recibir respuestas contextualizadas basadas en tus documentos personales
+
+### API Endpoints
+
+#### Consultas RAG
+```bash
+POST /api/agent/query
+Content-Type: application/json
+
+{
+  "query": "¿Cuáles son los pasos para configurar mi proyecto?"
+}
+```
+
+#### Carga de Documentos
+```bash
+POST /api/agent/upload
+Content-Type: multipart/form-data
+
+# Archivo PDF, texto, manual, notas o cualquier documento personal
+```
+
+#### Estadísticas
+```bash
+GET /api/agent/statistics
+```
+
+#### Salud del Sistema
+```bash
+GET /api/agent/health
+```
+
+#### Limpiar Documentos
+```bash
+DELETE /api/agent/documents
+```
+
+## 💻 Desarrollo
+
+### Comandos Nx
+
+```bash
+# Ejecutar backend en modo desarrollo
+npx nx serve backend
+
+# Ejecutar frontend en modo desarrollo  
+npx nx dev frontend
+
+# Construir proyectos
 npx nx build backend
+npx nx build frontend
+npx nx build libs
+
+# Ejecutar linting
+npx nx lint backend
+npx nx lint frontend
+
+# Verificación de tipos
+npx nx typecheck backend
+npx nx typecheck frontend
+
+# Tests end-to-end
+npx nx e2e backend-e2e
+
+# Construir todos los proyectos
+npx nx run-many -t build
+
+# Ver gráfico de dependencias
+npx nx graph
 ```
 
-To see all available targets to run for a project, run:
+### Configuración de Entorno
 
-```sh
-npx nx show project backend
+Archivo `apps/backend/.env`:
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/search_mind
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_CHAT_MODEL=gemma2:2b
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+PORT=3000
+NODE_ENV=development
+LOG_LEVEL=info
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 🐳 Docker
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Servicios Incluidos
 
-## Add new projects
+- **database**: PostgreSQL 15 con pgvector
+- **ollama**: Servidor Ollama para modelos LLM locales
+- **backend**: API Express.js
+- **frontend**: Aplicación Next.js
+- **nginx**: Proxy reverso con rate limiting (perfil production)
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+### Comandos Docker
 
-Use the plugin's generator to create new projects.
+```bash
+# Ejecutar stack completo
+docker-compose up -d
 
-To generate a new application, use:
+# Solo servicios básicos (sin nginx)
+docker-compose up -d database ollama backend frontend
 
-```sh
-npx nx g @nx/node:app demo
+# Ejecutar con nginx (producción)
+docker-compose --profile production up -d
+
+# Reconstruir imágenes
+docker-compose build --no-cache
+
+# Ver logs específicos
+docker-compose logs backend
+docker-compose logs frontend
+
+# Limpiar volúmenes
+docker-compose down -v
 ```
 
-To generate a new library, use:
+## 📊 Monitoreo
 
-```sh
-npx nx g @nx/node:lib mylib
+### Health Checks
+
+Todos los servicios incluyen health checks configurados:
+
+- **Backend**: `GET /api/agent/health`
+- **Frontend**: Verificación del servidor Next.js
+- **Database**: `pg_isready`
+- **Ollama**: `GET /api/tags`
+
+### Logs
+
+```bash
+# Logs de todos los servicios
+docker-compose logs -f
+
+# Logs específicos
+docker-compose logs -f backend
+docker-compose logs -f frontend
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+## 🔧 Personalización
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Modelos Ollama
 
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+Para cambiar modelos, actualizar en `docker-compose.yml`:
+```yaml
+environment:
+  - OLLAMA_CHAT_MODEL=gemma2:2b  # Cambiar modelo de chat
+  - OLLAMA_EMBEDDING_MODEL=nomic-embed-text  # Cambiar modelo de embeddings
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+### Configuración de Base de Datos
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+El script `init-db.sql` configura automáticamente:
+- Extensión pgvector
+- Tabla de documentos con índices optimizados
+- Triggers para timestamps
 
-### Step 2
+## 🤝 Contribución
 
-Use the following command to configure a CI workflow for your workspace:
+1. **Fork del repositorio**: Haz un fork del proyecto a tu cuenta de GitHub
+2. **Clonar tu fork**: `git clone https://github.com/tu-usuario/search-mind.git`
+3. **Crear rama feature**: `git checkout -b feature/nueva-funcionalidad`
+4. **Realizar cambios**: Implementa tu funcionalidad o corrección
+5. **Commit cambios**: `git commit -am 'Agregar nueva funcionalidad'`
+6. **Push a tu fork**: `git push origin feature/nueva-funcionalidad`
+7. **Crear Pull Request**: Desde tu fork hacia el repositorio original
 
-```sh
-npx nx g ci-workflow
-```
+## 📄 Licencia
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para detalles.
 
-## Install Nx Console
+## 🆘 Soporte
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+Para reportar problemas o solicitar funcionalidades, crear un issue en el repositorio.
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/node?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+**SearchMind** - Tu asistente personal inteligente alimentado con tus propios datos
